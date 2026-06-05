@@ -54,7 +54,7 @@ export default function SponsoredPage() {
 
             <div className="flex flex-col items-center justify-center space-y-8 bg-[#FAFAFA] p-10 rounded-2xl border border-[var(--border)] shadow-inner">
               <div className="w-28 h-28 bg-white rounded-3xl shadow-sm border border-[var(--border)] flex items-center justify-center overflow-hidden p-3">
-                <img src="/logo.jpg" alt="ExcelTech Logo" className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-screen" />
+                <img src="/logo.jpg" alt="ExcelTech Logo" className="w-full h-full object-contain" />
               </div>
               <div className="text-center">
                 <h3 className="font-bold text-2xl text-[var(--foreground)] mb-1">ExcelTech</h3>

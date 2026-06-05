@@ -32,7 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="w-64 border-r border-[var(--border)] bg-[var(--muted)] flex flex-col">
         <div className="h-16 flex items-center px-6 border-b border-[var(--border)] bg-white">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 flex items-center justify-center mix-blend-multiply dark:mix-blend-screen transition-transform group-hover:scale-105">
+            <div className="w-8 h-8 flex items-center justify-center transition-transform group-hover:scale-105">
               <img src="/logo.jpg" alt="ETS Logo" className="w-full h-full object-contain" />
             </div>
             <span className="font-heading font-bold text-lg text-[var(--foreground)] tracking-tight">

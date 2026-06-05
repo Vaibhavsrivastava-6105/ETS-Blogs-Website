@@ -34,7 +34,7 @@ export default function Navbar() {
             {/* Left: Logo */}
             <div className="flex items-center">
               <Link href="/" className="flex items-center gap-3 group">
-                <div className="relative w-10 h-10 transition-transform group-hover:scale-105 flex items-center justify-center mix-blend-multiply dark:mix-blend-screen">
+                <div className="relative w-10 h-10 transition-transform group-hover:scale-105 flex items-center justify-center">
                   <img src="/logo.jpg" alt="ETS Logo" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-heading font-black text-2xl tracking-tight text-[var(--foreground)] uppercase">
