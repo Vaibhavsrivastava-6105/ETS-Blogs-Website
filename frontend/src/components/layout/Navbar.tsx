@@ -37,8 +37,12 @@ export default function Navbar() {
             {/* Center: Links Removed (Nav is handled via Side Menu) */}
 
             {/* Right: Actions */}
-            <div className="hidden md:flex items-center space-x-4">
-              <Link href="/sponsored" className="border-2 border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white px-6 py-2.5 text-xs uppercase tracking-widest font-bold transition-all">
+            <div className="hidden md:flex items-center space-x-6">
+              <Link href="/sponsored" className="text-xs uppercase tracking-widest font-bold text-[var(--muted-foreground)] hover:text-[var(--primary)] transition-colors py-2 flex items-center gap-2 group">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--primary)] opacity-40 group-hover:opacity-100 transition-opacity"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--primary)] opacity-70 group-hover:opacity-100 transition-opacity"></span>
+                </span>
                 Sponsored
               </Link>
               {isAdmin && (
