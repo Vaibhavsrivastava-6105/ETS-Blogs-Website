@@ -17,7 +17,17 @@ interface Article {
   publishedAt: string;
 }
 
-export default function ArticlesContent() {
+import { Suspense } from 'react';
+
+export default function ArticlesPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center min-h-screen"><Loader2 className="w-8 h-8 animate-spin text-[var(--primary)]" /></div>}>
+      <ArticlesContent />
+    </Suspense>
+  );
+}
+
+function ArticlesContent() {
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [activeCategory, setActiveCategory] = useState(searchParams.get("category") || "All");
