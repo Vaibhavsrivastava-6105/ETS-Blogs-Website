@@ -408,14 +408,14 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                           <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (file) {
-                              setSaveStatus('Saving...');
+                              setSaveStatus('saving');
                               try {
                                 const url = await uploadToCloudinary(file);
                                 setCoverImage(url);
-                                setSaveStatus('Saved');
+                                setSaveStatus('saved');
                               } catch (err) {
                                 alert('Failed to upload cover image');
-                                setSaveStatus('Saved');
+                                setSaveStatus('saved');
                               }
                             }
                           }} />
@@ -428,14 +428,14 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                       <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (file) {
-                          setSaveStatus('Saving...');
+                          setSaveStatus('saving');
                           try {
                             const url = await uploadToCloudinary(file);
                             setCoverImage(url);
-                            setSaveStatus('Saved');
+                            setSaveStatus('saved');
                           } catch (err) {
                             alert('Failed to upload cover image');
-                            setSaveStatus('Saved');
+                            setSaveStatus('saved');
                           }
                         }
                       }} />

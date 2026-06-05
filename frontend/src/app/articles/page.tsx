@@ -43,9 +43,9 @@ function ArticlesContent() {
         // Client-side sorting based on our new filter
         let fetchedArticles = Array.isArray(data.data) ? data.data : [];
         if (sortOrder === "asc") {
-          fetchedArticles = fetchedArticles.sort((a, b) => new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime());
+          fetchedArticles = fetchedArticles.sort((a: any, b: any) => new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime());
         } else {
-          fetchedArticles = fetchedArticles.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+          fetchedArticles = fetchedArticles.sort((a: any, b: any) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
         }
         
         setArticles(fetchedArticles);
