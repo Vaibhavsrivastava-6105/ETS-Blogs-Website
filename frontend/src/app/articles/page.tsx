@@ -33,15 +33,15 @@ function ArticlesContent() {
     const fetchArticles = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch('http://localhost:5000/api/articles/search', {
+        const res = await fetch('/api/search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ q: searchQuery, category: activeCategory })
+          body: JSON.stringify({ query: searchQuery, category: activeCategory })
         });
         const data = await res.json();
         
         // Client-side sorting based on our new filter
-        let fetchedArticles = Array.isArray(data) ? data : [];
+        let fetchedArticles = Array.isArray(data.data) ? data.data : [];
         if (sortOrder === "asc") {
           fetchedArticles = fetchedArticles.sort((a, b) => new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime());
         } else {
@@ -72,7 +72,7 @@ function ArticlesContent() {
           Explore Articles
         </h1>
         <p className="text-xl text-[var(--muted-foreground)] max-w-2xl mb-10">
-          Dive into our library of expert insights. Powered by Gemini AI, try searching naturally!
+          Dive into our library of expert insights and tutorials.
         </p>
 
         {/* Search & Filter Bar */}
@@ -137,12 +137,12 @@ function ArticlesContent() {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-32 text-[var(--muted-foreground)]">
             <Loader2 className="w-12 h-12 animate-spin mb-4 text-[var(--primary)]" />
-            <p className="text-lg font-medium">Gemini is searching the catalog...</p>
+            <p className="text-lg font-medium">Searching the catalog...</p>
           </div>
         ) : articles.length === 0 ? (
           <div className="py-20 text-center border border-dashed border-[var(--border)] rounded-2xl bg-[var(--muted)]/30">
             <h3 className="text-2xl font-bold font-heading text-[var(--foreground)] mb-2">No articles found</h3>
-            <p className="text-[var(--muted-foreground)]">Try adjusting your semantic search query or category filter.</p>
+            <p className="text-[var(--muted-foreground)]">Try adjusting your search query or category filter.</p>
             <button 
               onClick={() => { setSearchQuery(""); setActiveCategory("All"); }}
               className="mt-6 px-6 py-2 bg-white border border-[var(--border)] rounded-lg text-sm font-semibold hover:bg-[var(--muted)] transition-colors"

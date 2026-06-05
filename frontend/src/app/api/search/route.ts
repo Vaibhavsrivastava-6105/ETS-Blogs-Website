@@ -4,26 +4,31 @@ import Article from '@/models/Article';
 
 export async function POST(req: Request) {
   try {
-    const { query } = await req.json();
-
-    if (!query || typeof query !== 'string') {
-      return NextResponse.json({ success: false, error: 'Query is required' }, { status: 400 });
-    }
+    const { query, category } = await req.json();
 
     await connectDB();
 
-    // Perform a case-insensitive regex search across multiple fields
-    const searchRegex = new RegExp(query, 'i');
-    
-    const matchedArticles = await Article.find({
-      status: 'Published',
-      $or: [
+    let dbQuery: any = { status: 'Published' };
+
+    // Apply category filter
+    if (category && category !== 'All') {
+      dbQuery.category = category;
+    }
+
+    // Apply search filter if query exists
+    if (query && typeof query === 'string' && query.trim() !== '') {
+      const searchRegex = new RegExp(query, 'i');
+      dbQuery.$or = [
         { title: { $regex: searchRegex } },
         { content: { $regex: searchRegex } },
-        { category: { $regex: searchRegex } },
         { tags: { $regex: searchRegex } }
-      ]
-    }).sort({ publishedAt: -1 }).limit(20);
+      ];
+      // Note: we removed category from $or here because it's handled by the dropdown filter above
+    }
+    
+    const matchedArticles = await Article.find(dbQuery)
+      .sort({ publishedAt: -1 })
+      .limit(50);
 
     return NextResponse.json({ success: true, data: matchedArticles });
   } catch (error: any) {
