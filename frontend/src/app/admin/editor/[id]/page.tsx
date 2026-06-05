@@ -46,7 +46,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
   
   // Core Document State
   const [title, setTitle] = useState("");
-  const [slug, setSlug] = useState("");
+
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "unsaved">("saved");
   const [lastSaved, setLastSaved] = useState<Date>(new Date());
   
@@ -227,7 +227,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: title || "Untitled Article",
-          slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+
           content: htmlContent,
           category,
           tags,
@@ -369,23 +369,10 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                   setSaveStatus("unsaved");
                   e.target.style.height = 'auto';
                   e.target.style.height = `${e.target.scrollHeight}px`;
-                  if (!slug) setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
                 }}
                 className="w-full text-5xl font-black font-heading tracking-tight text-[var(--foreground)] placeholder-[var(--muted-foreground)]/50 border-none focus:outline-none focus:ring-0 bg-transparent resize-none overflow-hidden leading-tight"
               />
-              
-              {/* Slug Editor (visible when title has content) */}
-              <div className={`mt-2 flex items-center gap-2 transition-opacity ${title ? 'opacity-100' : 'opacity-0'}`}>
-                <span className="text-sm font-semibold text-[var(--muted-foreground)]">URL Slug:</span>
-                <Globe className="w-3.5 h-3.5 text-[var(--muted-foreground)]" />
-                <span className="text-sm text-[var(--muted-foreground)]">yoursite.com/articles/</span>
-                <input 
-                  type="text" 
-                  value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
-                  className="bg-transparent border-b border-dashed border-[var(--border)] focus:border-[var(--primary)] text-sm font-bold text-[var(--foreground)] focus:outline-none px-1"
-                />
-              </div>
+
             </div>
 
             {/* TipTap Editor Area */}
@@ -560,7 +547,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                 <div className="p-4 bg-[#FAFAFA] border border-[var(--border)] rounded-xl mb-6">
                   <h4 className="text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider mb-2">Search Preview</h4>
                   <div className="text-blue-600 text-sm font-bold truncate">{metaTitle || title || "Your Article Title"}</div>
-                  <div className="text-emerald-700 text-xs truncate">yoursite.com/articles/{slug || "slug"}</div>
+                  <div className="text-emerald-700 text-xs truncate">yoursite.com/articles/{initialId !== 'new' ? initialId : 'draft'}</div>
                   <div className="text-slate-600 text-xs mt-1 line-clamp-2">{metaDescription || "Your meta description will appear here in search engine results."}</div>
                 </div>
 
