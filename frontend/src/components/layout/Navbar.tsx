@@ -37,7 +37,10 @@ export default function Navbar() {
             {/* Center: Links Removed (Nav is handled via Side Menu) */}
 
             {/* Right: Actions */}
-            <div className="hidden md:flex items-center space-x-6">
+            <div className="hidden md:flex items-center space-x-4">
+              <Link href="/sponsored" className="border-2 border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white px-6 py-2.5 text-xs uppercase tracking-widest font-bold transition-all">
+                Sponsored
+              </Link>
               {isAdmin && (
                 <Link href="/admin" className="bg-[var(--primary)] text-white px-6 py-3 text-xs uppercase tracking-widest font-bold transition-all hover:bg-blue-800">
                   Dashboard
@@ -105,6 +108,16 @@ export default function Navbar() {
                     </Link>
                   </li>
                 ))}
+                <li className="border-b border-[var(--border)]/70">
+                  <Link 
+                    href="/sponsored" 
+                    onClick={() => setIsSideMenuOpen(false)}
+                    className="flex items-center justify-between px-6 py-5 text-[var(--primary)] hover:bg-[var(--primary)]/5 text-base font-bold transition-colors"
+                  >
+                    Sponsored
+                    <span className="text-xs uppercase tracking-widest opacity-70">Ad</span>
+                  </Link>
+                </li>
                 {isAdmin ? (
                   <li className="border-b border-[var(--border)]/70 bg-[var(--primary)]/5">
                     <Link 
