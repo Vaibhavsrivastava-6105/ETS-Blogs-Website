@@ -65,6 +65,9 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
   const [visibility, setVisibility] = useState("Public");
   const [scheduleDate, setScheduleDate] = useState("");
   const [scheduleTime, setScheduleTime] = useState("");
+  const [isPublished, setIsPublished] = useState(false);
+  const [publishedArticleId, setPublishedArticleId] = useState<string | null>(null);
+  const contentHashRef = useRef<string>("");
   
   // SEO Data
   const [metaTitle, setMetaTitle] = useState("");
@@ -131,12 +134,20 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
           let data = await res.json();
           
           // Fallback to loading as an Article if draft is missing
+          let isLoadedFromArticle = false;
           if (!data.success || !data.data) {
             res = await fetch(`/api/articles/${initialId}`);
             data = await res.json();
+            if (data.success && data.data) {
+              isLoadedFromArticle = true;
+            }
           }
 
           if (data.success && data.data) {
+            if (isLoadedFromArticle || data.data.status === 'Published') {
+              setIsPublished(true);
+              setPublishedArticleId(data.data._id);
+            }
             setTitle(data.data.title || '');
             setCategory(data.data.category || 'Software Design');
             
@@ -151,6 +162,21 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             
             if (data.data.content) {
               editor.commands.setContent(data.data.content, { emitUpdate: false });
+            }
+
+            if (isLoadedFromArticle || data.data.status === 'Published') {
+              contentHashRef.current = JSON.stringify({ 
+                title: data.data.title || '', 
+                category: data.data.category || 'Software Design', 
+                tags: Array.isArray(data.data.tags) ? data.data.tags.join(', ') : (data.data.tags || ''), 
+                coverImage: data.data.coverImage || '', 
+                content: data.data.content || '', 
+                status: data.data.status || 'Draft', 
+                visibility: data.data.visibility || 'Public', 
+                metaTitle: data.data.seo?.metaTitle || '', 
+                metaDescription: data.data.seo?.metaDescription || '', 
+                keywords: data.data.seo?.keywords || '' 
+              });
             }
             
             // After loading server data, check if there's a newer local backup
@@ -242,13 +268,48 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
     if (!editor) return;
     const htmlContent = editor.getHTML();
     
+    const currentHash = JSON.stringify({ title: title || '', category, tags, coverImage, content: htmlContent, status, visibility, metaTitle, metaDescription, keywords });
+
+    if (isPublished && publishedArticleId) {
+      if (currentHash === contentHashRef.current) {
+        alert("Article has been already published.");
+        return;
+      }
+      
+      try {
+        const res = await fetch(`/api/articles/${publishedArticleId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: title || "Untitled Article",
+            content: htmlContent,
+            category,
+            tags,
+            coverImage,
+            status: status,
+            visibility: visibility,
+            seo: { metaTitle, metaDescription, keywords }
+          }),
+        });
+        
+        if (res.ok) {
+          contentHashRef.current = currentHash;
+          alert("Article edits have been saved.");
+        }
+      } catch (error) {
+        console.error("Publish update failed", error);
+      }
+      return;
+    }
+    
+    alert("Your article will publish in some time.");
+
     try {
       const res = await fetch('/api/articles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: title || "Untitled Article",
-
           content: htmlContent,
           category,
           tags,
@@ -260,13 +321,18 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
         }),
       });
 
-      if (res.ok && draftId) {
-        // Clean up draft
-        await fetch(`/api/drafts/${draftId}`, { method: 'DELETE' });
-        localStorage.removeItem(`draft-backup-${initialId}`);
-      }
+      if (res.ok) {
+        const responseData = await res.json();
+        setIsPublished(true);
+        setPublishedArticleId(responseData.data._id);
+        contentHashRef.current = currentHash;
 
-      router.push("/admin/articles");
+        if (draftId && draftId !== 'new') {
+          // Clean up draft
+          await fetch(`/api/drafts/${draftId}`, { method: 'DELETE' });
+          localStorage.removeItem(`draft-backup-${initialId}`);
+        }
+      }
     } catch (error) {
       console.error("Publish failed", error);
     }
