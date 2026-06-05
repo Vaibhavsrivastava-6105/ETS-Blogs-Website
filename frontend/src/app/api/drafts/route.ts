@@ -24,6 +24,9 @@ export async function POST(req: Request) {
         { 
           title: body.title || 'Untitled Draft', 
           content: body.content, 
+          category: body.category,
+          tags: body.tags,
+          coverImage: body.coverImage,
           lastSaved: new Date() 
         },
         { new: true, runValidators: true, upsert: true, setDefaultsOnInsert: true }
@@ -37,6 +40,9 @@ export async function POST(req: Request) {
     const newDraft = await Draft.create({
       title: body.title || 'Untitled Draft',
       content: body.content,
+      category: body.category,
+      tags: body.tags,
+      coverImage: body.coverImage,
     });
     return NextResponse.json({ success: true, data: newDraft }, { status: 201 });
   } catch (error: any) {

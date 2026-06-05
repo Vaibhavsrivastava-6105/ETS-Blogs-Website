@@ -435,13 +435,21 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                           <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (file) {
+                              if (!file.type.startsWith('image/')) {
+                                alert('Please select a valid image file (JPEG, PNG, WEBP).');
+                                return;
+                              }
+                              if (file.size > 4 * 1024 * 1024) {
+                                alert('Image size exceeds 4MB. Please choose a smaller image or compress it.');
+                                return;
+                              }
                               setSaveStatus('saving');
                               try {
                                 const url = await uploadToCloudinary(file);
                                 setCoverImage(url);
                                 setSaveStatus('saved');
-                              } catch (err) {
-                                alert('Failed to upload cover image');
+                              } catch (err: any) {
+                                alert(`Failed to upload cover image: ${err.message || 'Unknown error'}`);
                                 setSaveStatus('saved');
                               }
                             }
@@ -455,13 +463,21 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                       <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (file) {
+                          if (!file.type.startsWith('image/')) {
+                            alert('Please select a valid image file (JPEG, PNG, WEBP).');
+                            return;
+                          }
+                          if (file.size > 4 * 1024 * 1024) {
+                            alert('Image size exceeds 4MB. Please choose a smaller image or compress it.');
+                            return;
+                          }
                           setSaveStatus('saving');
                           try {
                             const url = await uploadToCloudinary(file);
                             setCoverImage(url);
                             setSaveStatus('saved');
-                          } catch (err) {
-                            alert('Failed to upload cover image');
+                          } catch (err: any) {
+                            alert(`Failed to upload cover image: ${err.message || 'Unknown error'}`);
                             setSaveStatus('saved');
                           }
                         }

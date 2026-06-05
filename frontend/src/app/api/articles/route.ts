@@ -28,6 +28,7 @@ export async function POST(req: Request) {
       content: body.content,
       category: body.category,
       tags: parsedTags,
+      coverImage: body.coverImage,
     });
 
     return NextResponse.json({ success: true, data: newArticle }, { status: 201 });
