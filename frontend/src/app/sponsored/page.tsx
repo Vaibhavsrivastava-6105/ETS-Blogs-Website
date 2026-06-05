@@ -19,10 +19,10 @@ export default function SponsoredPage() {
         </div>
 
         {/* Hero Section */}
-        <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
-          <h1 className="text-5xl md:text-6xl font-black font-heading tracking-tight text-[var(--foreground)] mb-6">
-            Sponsored & Organized by <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">ExcelTech Solutions</span>
+          <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-8 flex flex-col items-center justify-center leading-[1.1]">
+            <span className="text-[var(--foreground)] font-serif">Sponsored by</span>
+            <span className="text-[#0D52BD] italic font-serif my-1">ExcelTech</span>
+            <span className="text-[#ECA518] font-serif">Solutions</span>
           </h1>
           <p className="text-xl text-[var(--muted-foreground)] max-w-2xl mx-auto leading-relaxed">
             Empowering businesses through cutting-edge technology, innovative software development, and transformative digital solutions.

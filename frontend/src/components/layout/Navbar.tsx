@@ -37,8 +37,11 @@ export default function Navbar() {
                 <div className="relative w-12 h-12 transition-transform group-hover:scale-105 flex items-center justify-center">
                   <img src="/logo.jpg" alt="ETS Logo" className="w-full h-full object-contain scale-[1.4]" />
                 </div>
-                <span className="font-heading font-black text-2xl tracking-tight text-[var(--foreground)] uppercase ml-1">
-                  ETS<span className="text-[var(--primary)]">.</span>
+                <span className="text-2xl tracking-tight uppercase ml-2 flex items-baseline leading-none mt-1">
+                  <span className="text-[var(--foreground)] font-serif font-black">E</span>
+                  <span className="text-[#0D52BD] italic font-serif font-black">T</span>
+                  <span className="text-[#ECA518] font-serif font-black">S</span>
+                  <span className="text-[var(--primary)] font-black">.</span>
                 </span>
               </Link>
             </div>
