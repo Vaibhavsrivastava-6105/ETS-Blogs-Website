@@ -1,19 +1,25 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
-  Folder, Plus, Search, Edit3, Trash2, Eye, 
-  AlertTriangle, UploadCloud, ArrowRight
+  Folder, Plus, Search, Trash2, Eye, 
+  AlertTriangle
 } from 'lucide-react';
 import Link from 'next/link';
 
+interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  count: number;
+  views?: number;
+  status: string;
+}
+
 export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState([
-    { id: '1', name: 'Software Design', slug: 'software-design', description: 'Architecture, patterns, and best practices for building robust software.', count: 12, views: 15400, status: 'Active' },
-    { id: '2', name: 'Web Development', slug: 'web-development', description: 'Frontend and backend development for the modern web.', count: 8, views: 9200, status: 'Active' },
-    { id: '3', name: 'Tutorials', slug: 'tutorials', description: 'Step-by-step guides on various technologies.', count: 24, views: 32100, status: 'Active' },
-    { id: '4', name: 'Tech News', slug: 'tech-news', description: 'Latest updates from the tech world.', count: 5, views: 4300, status: 'Active' },
-  ]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -29,36 +35,75 @@ export default function AdminCategoriesPage() {
   // Delete State
   const [reassignTo, setReassignTo] = useState('');
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch('/api/categories');
+      const data = await res.json();
+      if (data.success) {
+        setCategories(data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const filteredCategories = categories.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
-  const handleCreate = (e: React.FormEvent) => {
+  const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formName) return;
-    const newCat = {
-      id: Date.now().toString(),
-      name: formName,
-      slug: formSlug || formName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-      description: formDesc,
-      count: 0,
-      views: 0,
-      status: 'Active'
-    };
-    setCategories([newCat, ...categories]);
-    // Reset form
-    setFormName('');
-    setFormSlug('');
-    setFormDesc('');
-    setFormIcon('');
+    if (!formName || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formName,
+          slug: formSlug || formName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          description: formDesc,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCategories([data.data, ...categories]);
+        setFormName('');
+        setFormSlug('');
+        setFormDesc('');
+        setFormIcon('');
+      }
+    } catch (error) {
+      console.error('Failed to create category:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!showDeleteModal) return;
-    setCategories(categories.filter(c => c.id !== showDeleteModal));
-    setShowDeleteModal(null);
-    setReassignTo('');
+    try {
+      const res = await fetch(`/api/categories/${showDeleteModal}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setCategories(categories.filter(c => c._id !== showDeleteModal));
+      }
+    } catch (error) {
+      console.error('Failed to delete category:', error);
+    } finally {
+      setShowDeleteModal(null);
+      setReassignTo('');
+    }
   };
 
-  const categoryToDelete = categories.find(c => c.id === showDeleteModal);
+  const categoryToDelete = categories.find(c => c._id === showDeleteModal);
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#F8FAFC] flex flex-col min-h-screen">
@@ -128,10 +173,10 @@ export default function AdminCategoriesPage() {
 
               <button 
                 type="submit" 
-                disabled={!formName} 
+                disabled={!formName || isSubmitting} 
                 className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-lg text-sm font-bold bg-[var(--foreground)] text-[var(--background)] hover:opacity-90 transition-opacity disabled:opacity-50 mt-4"
               >
-                <Plus className="w-4 h-4" /> Save Category
+                <Plus className="w-4 h-4" /> {isSubmitting ? 'Saving...' : 'Save Category'}
               </button>
             </form>
           </div>
@@ -170,7 +215,13 @@ export default function AdminCategoriesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--border)]">
-                  {filteredCategories.length === 0 ? (
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-16 text-center text-[var(--muted-foreground)]">
+                        Loading categories...
+                      </td>
+                    </tr>
+                  ) : filteredCategories.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="px-6 py-16 text-center">
                         <Folder className="w-12 h-12 text-[var(--border)] mx-auto mb-4" />
@@ -179,7 +230,7 @@ export default function AdminCategoriesPage() {
                       </td>
                     </tr>
                   ) : filteredCategories.map((cat) => (
-                    <tr key={cat.id} className="hover:bg-[#FAFAFA] transition-colors group">
+                    <tr key={cat._id} className="hover:bg-[#FAFAFA] transition-colors group">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-lg bg-[var(--muted)] flex items-center justify-center text-[var(--muted-foreground)]">
@@ -206,7 +257,7 @@ export default function AdminCategoriesPage() {
                           <Link href={`/admin/articles?category=${cat.name}`} className="p-2 bg-white border border-[var(--border)] rounded-lg text-sm font-bold shadow-sm hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors text-[var(--muted-foreground)]" title="View Articles">
                             <Eye className="w-4 h-4" />
                           </Link>
-                          <button onClick={() => setShowDeleteModal(cat.id)} className="p-2 bg-white border border-[var(--border)] rounded-lg text-sm font-bold shadow-sm hover:border-red-500 hover:bg-red-50 hover:text-red-600 transition-colors text-[var(--muted-foreground)]" title="Delete Category">
+                          <button onClick={() => setShowDeleteModal(cat._id)} className="p-2 bg-white border border-[var(--border)] rounded-lg text-sm font-bold shadow-sm hover:border-red-500 hover:bg-red-50 hover:text-red-600 transition-colors text-[var(--muted-foreground)]" title="Delete Category">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -244,8 +295,8 @@ export default function AdminCategoriesPage() {
                 >
                   <option value="" disabled>Select a category...</option>
                   <option value="Uncategorized">Uncategorized</option>
-                  {categories.filter(c => c.id !== categoryToDelete.id).map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
+                  {categories.filter(c => c._id !== categoryToDelete._id).map(c => (
+                    <option key={c._id} value={c._id}>{c.name}</option>
                   ))}
                 </select>
               </div>

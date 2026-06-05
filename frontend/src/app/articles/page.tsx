@@ -5,8 +5,6 @@ import { Search, Loader2, ArrowRight, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-const CATEGORIES = ["All", "Software Design", "Web Development", "Tutorials", "Tech News"];
-
 interface Article {
   _id: string;
   title: string;
@@ -32,10 +30,27 @@ function ArticlesContent() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [activeCategory, setActiveCategory] = useState(searchParams.get("category") || "All");
   const [articles, setArticles] = useState<Article[]>([]);
+  const [categories, setCategories] = useState<string[]>(["All"]);
   const [isLoading, setIsLoading] = useState(true);
   
   // New States for Filters
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch('/api/categories');
+        const data = await res.json();
+        if (data.success) {
+          const names = data.data.map((c: any) => c.name);
+          setCategories(["All", ...names]);
+        }
+      } catch (err) {
+        console.error("Failed to load categories:", err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -121,7 +136,7 @@ function ArticlesContent() {
             <div>
               <label className="block text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider mb-3">Categories</label>
               <div className="flex flex-col gap-1">
-                {CATEGORIES.map(category => (
+                {categories.map(category => (
                   <button
                     key={category}
                     onClick={() => setActiveCategory(category)}
