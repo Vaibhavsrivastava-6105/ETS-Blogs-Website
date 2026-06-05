@@ -162,7 +162,7 @@ function ArticlesContent() {
                   />
                   <div className="absolute top-4 left-4">
                     <span className="bg-white/95 backdrop-blur-sm px-3 py-1 rounded-md text-xs font-bold text-[var(--primary)] shadow-sm">
-                      {article.category || "Uncategorized"}
+                      {article.category?.name || (typeof article.category === 'string' ? article.category : "Uncategorized")}
                     </span>
                   </div>
                 </div>
