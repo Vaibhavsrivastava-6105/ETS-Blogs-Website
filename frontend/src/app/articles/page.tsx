@@ -153,7 +153,7 @@ function ArticlesContent() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {articles.map((article) => (
-              <Link href={`/articles/${article.slug}`} key={article.id} className="group flex flex-col bg-white border border-[var(--border)] rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-indigo-50 transition-all hover:-translate-y-1">
+              <Link href={`/articles/${(article as any)._id}`} key={(article as any)._id} className="group flex flex-col bg-white border border-[var(--border)] rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-indigo-50 transition-all hover:-translate-y-1">
                 <div className="aspect-[16/10] overflow-hidden relative bg-[var(--muted)]">
                   <img 
                     src={article.coverImage || "https://images.unsplash.com/photo-1618401471353-b98a5233c591?auto=format&fit=crop&q=80"} 
