@@ -73,6 +73,14 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
 
   const router = useRouter();
   const titleRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize title textarea when content changes (e.g. on load)
+  useEffect(() => {
+    if (titleRef.current) {
+      titleRef.current.style.height = 'auto';
+      titleRef.current.style.height = `${titleRef.current.scrollHeight}px`;
+    }
+  }, [title]);
   
   // TipTap Editor Setup
   const editor = useEditor({
@@ -143,6 +151,19 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             
             if (data.data.content) {
               editor.commands.setContent(data.data.content, { emitUpdate: false });
+            }
+            
+            // After loading server data, check if there's a newer local backup
+            const backup = localStorage.getItem(`draft-backup-${initialId}`);
+            if (backup) {
+              const parsed = JSON.parse(backup);
+              const backupDate = new Date(parsed.timestamp).getTime();
+              const serverDate = new Date(data.data.lastSaved || data.data.updatedAt).getTime();
+              
+              // Only show recovery if local backup is newer than server save and less than 24 hours old
+              if (backupDate > serverDate && (new Date().getTime() - backupDate) / 1000 / 60 < 60 * 24) {
+                setShowRecoveryModal(true);
+              }
             }
           }
         } catch (err) {
