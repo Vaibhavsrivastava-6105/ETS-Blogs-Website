@@ -345,7 +345,7 @@ export default function AdminArticlesPage() {
                           <Link href={`/admin/editor/${article._id}`} className="flex items-center gap-2 px-4 py-2 text-sm font-medium hover:bg-[#FAFAFA] text-[var(--foreground)]">
                           <Edit3 className="w-4 h-4 text-[var(--muted-foreground)]" /> Edit Article
                         </Link>
-                        <Link href={`/articles/${article.slug}`} target="_blank" className="flex items-center gap-2 px-4 py-2 text-sm font-medium hover:bg-[#FAFAFA] text-[var(--foreground)]">
+                        <Link href={`/articles/${article._id}`} target="_blank" className="flex items-center gap-2 px-4 py-2 text-sm font-medium hover:bg-[#FAFAFA] text-[var(--foreground)]">
                           <Eye className="w-4 h-4 text-[var(--muted-foreground)]" /> Preview
                         </Link>
                         <button onClick={() => handleDuplicate(article)} className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm font-medium hover:bg-[#FAFAFA] text-[var(--foreground)]">

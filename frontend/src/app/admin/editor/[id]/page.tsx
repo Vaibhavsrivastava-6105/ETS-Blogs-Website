@@ -118,12 +118,24 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
         // Load existing draft
         setDraftId(initialId);
         try {
-          const res = await fetch(`/api/drafts/${initialId}`);
-          const data = await res.json();
+          // First attempt to load as a Draft
+          let res = await fetch(`/api/drafts/${initialId}`);
+          let data = await res.json();
+          
+          // Fallback to loading as an Article if draft is missing
+          if (!data.success || !data.data) {
+            res = await fetch(`/api/articles/${initialId}`);
+            data = await res.json();
+          }
+
           if (data.success && data.data) {
             setTitle(data.data.title || '');
             setCategory(data.data.category || 'Software Design');
-            setTags(data.data.tags || '');
+            
+            // Format tags if they come as an array from Article
+            const tagsData = data.data.tags;
+            setTags(Array.isArray(tagsData) ? tagsData.join(', ') : (tagsData || ''));
+            
             setCoverImage(data.data.coverImage || '');
             setMetaTitle(data.data.seo?.metaTitle || '');
             setMetaDescription(data.data.seo?.metaDescription || '');
@@ -134,7 +146,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             }
           }
         } catch (err) {
-          console.error("Failed to load draft:", err);
+          console.error("Failed to load document:", err);
           fetchedRef.current = false;
         }
       } else if (initialId === 'new') {
@@ -288,7 +300,10 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
           >
             <Save className="w-4 h-4" /> Save Draft
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-[var(--foreground)] bg-white border border-[var(--border)] shadow-sm hover:bg-[#FAFAFA] rounded-lg transition-colors">
+          <button 
+            onClick={() => window.open(`/articles/${initialId}`, '_blank')}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-[var(--foreground)] bg-white border border-[var(--border)] shadow-sm hover:bg-[#FAFAFA] rounded-lg transition-colors"
+          >
             <Eye className="w-4 h-4" /> Preview
           </button>
           <button 
