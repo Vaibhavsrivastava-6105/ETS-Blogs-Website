@@ -23,8 +23,11 @@ export default function Navbar() {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Articles", href: "/articles" },
-    { name: "Categories", href: "/categories" },
   ];
+
+  if (isAdminRoute) {
+    return null;
+  }
 
   return (
     <>

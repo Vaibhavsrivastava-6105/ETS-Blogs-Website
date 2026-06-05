@@ -1,32 +1,30 @@
 "use client";
 
 import Link from 'next/link';
-import { Search, Filter, Loader2 } from 'lucide-react';
-import { useState, useEffect, Suspense } from 'react';
+import { Search, Loader2, ArrowRight, User } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-const CATEGORIES = ["All", "Engineering", "Design", "Product", "Artificial Intelligence", "Security", "Databases"];
+const CATEGORIES = ["All", "Software Design", "Web Development", "Tutorials", "Tech News"];
 
 interface Article {
-  id: string;
+  _id: string;
   title: string;
-  slug: string;
   excerpt: string;
   coverImage: string;
-  category: { name: string };
+  category: string;
   author: { firstName: string; lastName: string; profileImage: string };
   publishedAt: string;
 }
 
-function ArticlesContent() {
+export default function ArticlesContent() {
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState(searchParams.get("category") || "All");
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   // New States for Filters
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
 
   useEffect(() => {
@@ -56,7 +54,7 @@ function ArticlesContent() {
       }
     };
 
-    // Debounce the AI search
+    // Debounce the search
     const timer = setTimeout(() => {
       fetchArticles();
     }, 500);
@@ -66,138 +64,165 @@ function ArticlesContent() {
 
   return (
     <div className="bg-[var(--background)] min-h-screen pb-24">
-      {/* Header Section */}
-      <section className="pt-16 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b border-[var(--border)]">
-        <h1 className="text-4xl md:text-6xl font-bold font-heading text-[var(--foreground)] tracking-tight mb-6">
-          Explore Articles
-        </h1>
-        <p className="text-xl text-[var(--muted-foreground)] max-w-2xl mb-10">
-          Dive into our library of expert insights and tutorials.
-        </p>
-
-        {/* Search & Filter Bar */}
-        <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--muted-foreground)]" />
-            <input 
-              type="text" 
-              placeholder="Ask anything... (e.g. 'how to scale databases?')" 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-white border border-[var(--border)] rounded-lg focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] transition-all shadow-sm"
-            />
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-16 flex flex-col lg:flex-row gap-12 lg:gap-20">
+        
+        {/* LEFT SIDEBAR: Hero, Search, Filters & Categories */}
+        <aside className="lg:w-80 flex-shrink-0 flex flex-col gap-10">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-black font-heading text-[var(--foreground)] tracking-tight mb-4 leading-tight">
+              Explore<br />Articles
+            </h1>
+            <p className="text-lg text-[var(--muted-foreground)] leading-relaxed">
+              Dive into our library of expert insights and tutorials.
+            </p>
           </div>
-          
-          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto relative">
-            <button 
-              onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-              className="flex items-center gap-2 px-4 py-2 bg-[var(--muted)] border border-[var(--border)] rounded-lg text-sm font-semibold hover:bg-gray-100 transition-colors"
-            >
-              <Filter className="w-4 h-4" /> Filters
-            </button>
-            
-            {/* Filter Dropdown */}
-            {isFiltersOpen && (
-              <div className="absolute top-12 left-0 w-48 bg-white border border-[var(--border)] rounded-xl shadow-xl z-50 p-2 flex flex-col gap-1">
-                <span className="text-xs font-bold text-[var(--muted-foreground)] px-3 py-1 uppercase tracking-wider">Sort By</span>
-                <button 
-                  onClick={() => { setSortOrder("desc"); setIsFiltersOpen(false); }}
-                  className={`text-left px-3 py-2 text-sm font-medium rounded-lg transition-colors ${sortOrder === "desc" ? "bg-[var(--primary)] text-white" : "hover:bg-[var(--muted)] text-[var(--foreground)]"}`}
-                >
-                  Newest First
-                </button>
-                <button 
-                  onClick={() => { setSortOrder("asc"); setIsFiltersOpen(false); }}
-                  className={`text-left px-3 py-2 text-sm font-medium rounded-lg transition-colors ${sortOrder === "asc" ? "bg-[var(--primary)] text-white" : "hover:bg-[var(--muted)] text-[var(--foreground)]"}`}
-                >
-                  Oldest First
-                </button>
-              </div>
-            )}
 
-            <div className="h-6 w-px bg-[var(--border)] mx-1 hidden md:block"></div>
+          <div className="flex flex-col gap-8 bg-white border border-[var(--border)] p-6 rounded-2xl shadow-sm sticky top-28">
             
-            <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map(cat => (
-                <button 
-                  key={cat} 
-                  onClick={() => setActiveCategory(cat)}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${cat === activeCategory ? 'bg-[var(--foreground)] text-white' : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-transparent hover:border-[var(--border)] bg-transparent hover:bg-white'}`}
-                >
-                  {cat}
-                </button>
+            {/* Search */}
+            <div>
+              <label className="block text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider mb-3">Search</label>
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-foreground)]" />
+                <input 
+                  type="text" 
+                  placeholder="Keywords..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-4 py-3 bg-[#FAFAFA] border border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-shadow text-sm"
+                />
+              </div>
+            </div>
+
+            {/* Sort */}
+            <div>
+              <label className="block text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider mb-3">Sort By</label>
+              <select 
+                value={sortOrder} 
+                onChange={(e) => setSortOrder(e.target.value as "desc" | "asc")}
+                className="w-full px-4 py-3 bg-[#FAFAFA] border border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-sm appearance-none cursor-pointer"
+              >
+                <option value="desc">Newest First</option>
+                <option value="asc">Oldest First</option>
+              </select>
+            </div>
+
+            {/* Categories Menu */}
+            <div>
+              <label className="block text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider mb-3">Categories</label>
+              <div className="flex flex-col gap-1">
+                {CATEGORIES.map(category => (
+                  <button
+                    key={category}
+                    onClick={() => setActiveCategory(category)}
+                    className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center justify-between group
+                      ${activeCategory === category 
+                        ? 'bg-[var(--foreground)] text-[var(--background)] shadow-md' 
+                        : 'text-[var(--muted-foreground)] hover:bg-[#FAFAFA] hover:text-[var(--foreground)]'
+                      }`}
+                  >
+                    {category}
+                    {activeCategory === category && <ArrowRight className="w-4 h-4 opacity-70" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </aside>
+
+        {/* RIGHT CONTENT AREA: Dynamic Header & Articles Grid */}
+        <main className="flex-1 flex flex-col min-h-screen">
+          
+          {/* Top Dynamic Header */}
+          <div className="flex items-center gap-4 mb-10 pb-6 border-b border-[var(--border)]">
+            <div className="w-14 h-14 flex items-center justify-center shrink-0">
+              <img src="/logo.jpg" alt="ETS Logo" className="w-full h-full object-contain scale-[1.3]" />
+            </div>
+            <h2 className="text-3xl md:text-4xl font-black font-heading text-[var(--foreground)] tracking-tight">
+              {activeCategory === "All" ? "All Categories" : activeCategory}
+            </h2>
+          </div>
+
+          {/* Articles Grid */}
+          {isLoading ? (
+            <div className="flex justify-center items-center py-32">
+              <Loader2 className="w-8 h-8 animate-spin text-[var(--primary)]" />
+            </div>
+          ) : articles.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              {articles.map((article: any) => (
+                <Link href={`/articles/${article._id}`} key={article._id} className="group flex flex-col bg-white border border-[var(--border)] rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  
+                  {/* Image Container */}
+                  <div className="aspect-[16/10] bg-gray-100 overflow-hidden relative border-b border-[var(--border)]">
+                    {article.coverImage ? (
+                      <img 
+                        src={article.coverImage} 
+                        alt={article.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200">
+                        <span className="text-[var(--muted-foreground)] font-serif italic">No image available</span>
+                      </div>
+                    )}
+                    {/* Category Badge */}
+                    <div className="absolute top-4 left-4">
+                      <span className="bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-[var(--foreground)] shadow-sm">
+                        {article.category || 'Uncategorized'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-6 flex flex-col flex-grow">
+                    <h2 className="text-xl font-bold font-heading text-[var(--foreground)] mb-3 group-hover:text-[var(--primary)] transition-colors line-clamp-2 leading-tight">
+                      {article.title}
+                    </h2>
+                    
+                    <p className="text-[var(--muted-foreground)] text-sm mb-6 line-clamp-3 leading-relaxed flex-grow">
+                      {article.excerpt || "Read more about this topic inside the article."}
+                    </p>
+
+                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-[var(--border)]">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[var(--muted)] flex items-center justify-center overflow-hidden border border-[var(--border)] shrink-0">
+                          {article.author?.profileImage ? (
+                            <img src={article.author.profileImage} alt={article.author.firstName} className="w-full h-full object-cover" />
+                          ) : (
+                            <User className="w-4 h-4 text-[var(--muted-foreground)]" />
+                          )}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-[var(--foreground)]">
+                            {article.author?.firstName || 'Admin'} {article.author?.lastName || ''}
+                          </span>
+                          <span className="text-[10px] text-[var(--muted-foreground)]">
+                            {new Date(article.publishedAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="w-8 h-8 rounded-full bg-[var(--muted)] flex items-center justify-center group-hover:bg-[var(--primary)] group-hover:text-white transition-colors">
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </div>
+                  </div>
+
+                </Link>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-32 text-center border border-dashed border-[var(--border)] rounded-3xl bg-[#FAFAFA]">
+              <Search className="w-12 h-12 text-[var(--muted-foreground)] mb-4 opacity-50" />
+              <h3 className="text-2xl font-bold text-[var(--foreground)] mb-2 font-heading">No articles found</h3>
+              <p className="text-[var(--muted-foreground)]">Try adjusting your filters or search query.</p>
+            </div>
+          )}
+        </main>
 
-      {/* Articles Grid */}
-      <section className="pt-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-32 text-[var(--muted-foreground)]">
-            <Loader2 className="w-12 h-12 animate-spin mb-4 text-[var(--primary)]" />
-            <p className="text-lg font-medium">Searching the catalog...</p>
-          </div>
-        ) : articles.length === 0 ? (
-          <div className="py-20 text-center border border-dashed border-[var(--border)] rounded-2xl bg-[var(--muted)]/30">
-            <h3 className="text-2xl font-bold font-heading text-[var(--foreground)] mb-2">No articles found</h3>
-            <p className="text-[var(--muted-foreground)]">Try adjusting your search query or category filter.</p>
-            <button 
-              onClick={() => { setSearchQuery(""); setActiveCategory("All"); }}
-              className="mt-6 px-6 py-2 bg-white border border-[var(--border)] rounded-lg text-sm font-semibold hover:bg-[var(--muted)] transition-colors"
-            >
-              Clear Filters
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {articles.map((article) => (
-              <Link href={`/articles/${(article as any)._id}`} key={(article as any)._id} className="group flex flex-col bg-white border border-[var(--border)] rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-indigo-50 transition-all hover:-translate-y-1">
-                <div className="aspect-[16/10] overflow-hidden relative bg-[var(--muted)]">
-                  <img 
-                    src={article.coverImage || "https://images.unsplash.com/photo-1618401471353-b98a5233c591?auto=format&fit=crop&q=80"} 
-                    alt={article.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <span className="bg-white/95 backdrop-blur-sm px-3 py-1 rounded-md text-xs font-bold text-[var(--primary)] shadow-sm">
-                      {article.category?.name || (typeof article.category === 'string' ? article.category : "Uncategorized")}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="p-6 flex flex-col flex-grow">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[var(--muted-foreground)] mb-3 uppercase tracking-wider">
-                    <span>{new Date(article.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                  </div>
-                  
-                  <h3 className="text-2xl font-bold font-heading text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors leading-tight mb-3">
-                    {article.title}
-                  </h3>
-                  
-                  <p className="text-[var(--muted-foreground)] line-clamp-2 mb-6 flex-grow">
-                    {article.excerpt}
-                  </p>
-                  
-                  <div className="flex items-center gap-3 pt-4 border-t border-[var(--border)]">
-                    <img src={article.author?.profileImage || "https://i.pravatar.cc/150"} alt={article.author?.firstName} className="w-8 h-8 rounded-full" />
-                    <span className="text-sm font-semibold text-[var(--foreground)]">{article.author?.firstName} {article.author?.lastName}</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
+      </div>
     </div>
-  );
-}
-
-export default function ArticlesPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-[var(--primary)]" /></div>}>
-      <ArticlesContent />
-    </Suspense>
   );
 }
