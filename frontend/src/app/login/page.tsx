@@ -34,8 +34,8 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-[var(--background)] flex items-center justify-center p-4">
       <div className="bg-white p-8 rounded-3xl border border-[var(--border)] shadow-xl w-full max-w-sm text-center animate-in zoom-in duration-300">
-        <div className="w-16 h-16 bg-[var(--muted)] text-[var(--muted-foreground)] rounded-full flex items-center justify-center mx-auto mb-6">
-          <Lock className="w-8 h-8" />
+        <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center mix-blend-multiply dark:mix-blend-screen">
+          <img src="/logo.jpg" alt="ETS Logo" className="w-full h-full object-contain" />
         </div>
         <h1 className="text-2xl font-bold font-heading mb-2 text-[var(--foreground)]">Admin Login</h1>
         <p className="text-sm text-[var(--muted-foreground)] mb-6">Enter your credentials to continue.</p>
