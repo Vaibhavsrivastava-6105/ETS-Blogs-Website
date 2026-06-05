@@ -1,8 +1,8 @@
 import React from 'react';
 
 export const metadata = {
-  title: 'Sponsored by Exceltech Solutions | ETS Blogs',
-  description: 'Learn more about our official sponsor and organizer, Exceltech Solutions.',
+  title: 'Sponsored by ExcelTech Solutions | ETS Blogs',
+  description: 'Learn more about our official sponsor and organizer, ExcelTech Solutions.',
 };
 
 export default function SponsoredPage() {
@@ -22,7 +22,7 @@ export default function SponsoredPage() {
         <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
           <h1 className="text-5xl md:text-6xl font-black font-heading tracking-tight text-[var(--foreground)] mb-6">
             Sponsored & Organized by <br className="hidden md:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Exceltech Solutions</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">ExcelTech Solutions</span>
           </h1>
           <p className="text-xl text-[var(--muted-foreground)] max-w-2xl mx-auto leading-relaxed">
             Empowering businesses through cutting-edge technology, innovative software development, and transformative digital solutions.
@@ -40,11 +40,11 @@ export default function SponsoredPage() {
             
             <div className="space-y-6">
               <h2 className="text-3xl font-bold font-heading text-[var(--foreground)] tracking-tight">
-                About Exceltech Solutions
+                About ExcelTech Solutions
               </h2>
               <div className="space-y-4 text-[var(--muted-foreground)] text-lg leading-relaxed">
                 <p>
-                  <strong>Exceltech Solutions</strong> is a premier technology firm specializing in delivering scalable software, comprehensive IT infrastructure, and robust digital ecosystems. 
+                  <strong>ExcelTech Solutions</strong> is a premier technology firm specializing in delivering scalable software, comprehensive IT infrastructure, and robust digital ecosystems. 
                 </p>
                 <p>
                   Their team of industry experts works tirelessly to bridge the gap between complex business challenges and elegant technological solutions. They are the driving force organizing and sponsoring this platform, ensuring we have the resources to bring you top-tier content and features.
@@ -53,11 +53,11 @@ export default function SponsoredPage() {
             </div>
 
             <div className="flex flex-col items-center justify-center space-y-8 bg-[#FAFAFA] p-10 rounded-2xl border border-[var(--border)] shadow-inner">
-              <div className="w-28 h-28 bg-white rounded-3xl shadow-sm border border-[var(--border)] flex items-center justify-center text-4xl font-black font-heading text-blue-600">
-                ES
+              <div className="w-28 h-28 bg-white rounded-3xl shadow-sm border border-[var(--border)] flex items-center justify-center overflow-hidden p-3">
+                <img src="/logo.jpg" alt="ExcelTech Logo" className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-screen" />
               </div>
               <div className="text-center">
-                <h3 className="font-bold text-2xl text-[var(--foreground)] mb-1">Exceltech</h3>
+                <h3 className="font-bold text-2xl text-[var(--foreground)] mb-1">ExcelTech</h3>
                 <p className="text-sm font-medium text-[var(--muted-foreground)] uppercase tracking-widest">Technology Partner</p>
               </div>
               
