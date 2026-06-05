@@ -72,17 +72,42 @@ export default function AdminSettingsPage() {
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+  const uploadToCloudinary = async (file: File) => {
+    return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setSettings({
-          ...settings,
-          seo: { ...settings.seo, defaultOgImage: reader.result as string }
-        });
+      reader.onloadend = async () => {
+        try {
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: reader.result })
+          });
+          const data = await res.json();
+          if (data.success) resolve(data.url);
+          else reject(data.error);
+        } catch (err) {
+          reject(err);
+        }
       };
       reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsSaving(true);
+      try {
+        const url = await uploadToCloudinary(file);
+        setSettings({
+          ...settings,
+          seo: { ...settings.seo, defaultOgImage: url }
+        });
+      } catch (err) {
+        setErrorMsg('Failed to upload image to Cloudinary.');
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
 
@@ -391,12 +416,18 @@ export default function AdminSettingsPage() {
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                             <label className="cursor-pointer bg-white text-black px-4 py-2 rounded-lg text-sm font-bold shadow-sm">
                               Replace
-                              <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                              <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
-                                  const reader = new FileReader();
-                                  reader.onloadend = () => setSettings({...settings, appearance: {...settings.appearance, logo: reader.result as string}});
-                                  reader.readAsDataURL(file);
+                                  setIsSaving(true);
+                                  try {
+                                    const url = await uploadToCloudinary(file);
+                                    setSettings({...settings, appearance: {...settings.appearance, logo: url}});
+                                  } catch (err) {
+                                    setErrorMsg('Failed to upload logo.');
+                                  } finally {
+                                    setIsSaving(false);
+                                  }
                                 }
                               }} />
                             </label>
@@ -404,12 +435,18 @@ export default function AdminSettingsPage() {
                         </div>
                       ) : (
                         <label className="border-2 border-dashed border-[var(--border)] rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-[#FAFAFA] transition-colors cursor-pointer group block h-40">
-                          <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                          <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
-                                  const reader = new FileReader();
-                                  reader.onloadend = () => setSettings({...settings, appearance: {...settings.appearance, logo: reader.result as string}});
-                                  reader.readAsDataURL(file);
+                                  setIsSaving(true);
+                                  try {
+                                    const url = await uploadToCloudinary(file);
+                                    setSettings({...settings, appearance: {...settings.appearance, logo: url}});
+                                  } catch (err) {
+                                    setErrorMsg('Failed to upload logo.');
+                                  } finally {
+                                    setIsSaving(false);
+                                  }
                                 }
                               }} />
                           <ImageIcon className="w-6 h-6 text-[var(--muted-foreground)] mb-2 group-hover:text-[var(--primary)] transition-colors" />
@@ -425,12 +462,18 @@ export default function AdminSettingsPage() {
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                             <label className="cursor-pointer bg-white text-black px-4 py-2 rounded-lg text-sm font-bold shadow-sm">
                               Replace
-                              <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                              <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
-                                  const reader = new FileReader();
-                                  reader.onloadend = () => setSettings({...settings, appearance: {...settings.appearance, favicon: reader.result as string}});
-                                  reader.readAsDataURL(file);
+                                  setIsSaving(true);
+                                  try {
+                                    const url = await uploadToCloudinary(file);
+                                    setSettings({...settings, appearance: {...settings.appearance, favicon: url}});
+                                  } catch (err) {
+                                    setErrorMsg('Failed to upload favicon.');
+                                  } finally {
+                                    setIsSaving(false);
+                                  }
                                 }
                               }} />
                             </label>
@@ -438,12 +481,18 @@ export default function AdminSettingsPage() {
                         </div>
                       ) : (
                         <label className="border-2 border-dashed border-[var(--border)] rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-[#FAFAFA] transition-colors cursor-pointer group block h-40">
-                          <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                          <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
-                                  const reader = new FileReader();
-                                  reader.onloadend = () => setSettings({...settings, appearance: {...settings.appearance, favicon: reader.result as string}});
-                                  reader.readAsDataURL(file);
+                                  setIsSaving(true);
+                                  try {
+                                    const url = await uploadToCloudinary(file);
+                                    setSettings({...settings, appearance: {...settings.appearance, favicon: url}});
+                                  } catch (err) {
+                                    setErrorMsg('Failed to upload favicon.');
+                                  } finally {
+                                    setIsSaving(false);
+                                  }
                                 }
                               }} />
                           <UploadCloud className="w-6 h-6 text-[var(--muted-foreground)] mb-2 group-hover:text-[var(--primary)] transition-colors" />

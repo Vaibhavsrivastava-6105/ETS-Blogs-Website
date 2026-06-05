@@ -67,9 +67,6 @@ export default async function SingleArticle({ params }: { params: Promise<{ slug
               <div className="font-semibold text-[var(--foreground)]">{(article as any).author?.firstName || "Admin"} {(article as any).author?.lastName || "User"}</div>
               <div className="text-sm text-[var(--muted-foreground)]">{(article as any).author?.bio || 'Author and Contributor'}</div>
             </div>
-            <button className="ml-auto px-4 py-1.5 rounded-full border border-[var(--border)] text-sm font-medium hover:bg-[var(--muted)] transition-colors">
-              Follow
-            </button>
           </div>
         </header>
 

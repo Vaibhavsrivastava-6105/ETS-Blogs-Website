@@ -22,6 +22,27 @@ import { useRouter } from 'next/navigation';
 export default function EditorPage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
   const initialId = unwrappedParams.id;
+
+  const uploadToCloudinary = async (file: File) => {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: reader.result })
+          });
+          const data = await res.json();
+          if (data.success) resolve(data.url);
+          else reject(data.error);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
   
   // Core Document State
   const [title, setTitle] = useState("");
@@ -296,10 +317,23 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             <button onClick={() => editor?.chain().focus().toggleBulletList().run()} className={`p-2 rounded hover:bg-slate-100 ${editor?.isActive('bulletList') ? 'bg-slate-100 text-blue-600' : 'text-slate-600'}`}><List className="w-5 h-5" /></button>
             <button onClick={() => editor?.chain().focus().toggleBlockquote().run()} className={`p-2 rounded hover:bg-slate-100 ${editor?.isActive('blockquote') ? 'bg-slate-100 text-blue-600' : 'text-slate-600'}`}><Quote className="w-5 h-5" /></button>
             <button onClick={() => editor?.chain().focus().toggleCodeBlock().run()} className={`p-2 rounded hover:bg-slate-100 ${editor?.isActive('codeBlock') ? 'bg-slate-100 text-blue-600' : 'text-slate-600'}`}><Code className="w-5 h-5" /></button>
-            <button onClick={() => {
-              const url = window.prompt('URL');
-              if (url) editor?.chain().focus().setImage({ src: url }).run();
-            }} className="p-2 rounded hover:bg-slate-100 text-slate-600"><ImageIcon className="w-5 h-5" /></button>
+            <label className="p-2 rounded hover:bg-slate-100 text-slate-600 cursor-pointer">
+              <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setSaveStatus('saving');
+                  try {
+                    const url = await uploadToCloudinary(file);
+                    editor?.chain().focus().setImage({ src: url }).run();
+                    setSaveStatus('saved');
+                  } catch (err) {
+                    alert('Failed to upload image');
+                    setSaveStatus('saved');
+                  }
+                }
+              }} />
+              <ImageIcon className="w-5 h-5" />
+            </label>
           </div>
 
           <div className="max-w-4xl mx-auto px-8 py-12 pb-32">
@@ -369,24 +403,48 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                     <div className="relative rounded-xl overflow-hidden border border-[var(--border)] group">
                       <img src={coverImage} alt="Cover" className="w-full h-40 object-cover" />
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-                        <button onClick={() => {
-                          const url = prompt("Image URL", coverImage);
-                          if (url) setCoverImage(url);
-                        }} className="px-3 py-1.5 bg-white rounded-lg text-xs font-bold shadow-sm">Replace</button>
+                        <label className="cursor-pointer px-3 py-1.5 bg-white rounded-lg text-xs font-bold shadow-sm text-black">
+                          Replace
+                          <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              setSaveStatus('Saving...');
+                              try {
+                                const url = await uploadToCloudinary(file);
+                                setCoverImage(url);
+                                setSaveStatus('Saved');
+                              } catch (err) {
+                                alert('Failed to upload cover image');
+                                setSaveStatus('Saved');
+                              }
+                            }
+                          }} />
+                        </label>
                         <button onClick={() => setCoverImage("")} className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold shadow-sm">Remove</button>
                       </div>
                     </div>
                   ) : (
-                    <div className="border-2 border-dashed border-[var(--border)] rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-[#FAFAFA] transition-colors cursor-pointer group" onClick={() => {
-                      const url = prompt("Image URL (simulate upload)");
-                      if (url) setCoverImage(url);
-                    }}>
+                    <label className="border-2 border-dashed border-[var(--border)] rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-[#FAFAFA] transition-colors cursor-pointer group block">
+                      <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setSaveStatus('Saving...');
+                          try {
+                            const url = await uploadToCloudinary(file);
+                            setCoverImage(url);
+                            setSaveStatus('Saved');
+                          } catch (err) {
+                            alert('Failed to upload cover image');
+                            setSaveStatus('Saved');
+                          }
+                        }
+                      }} />
                       <div className="w-10 h-10 bg-[var(--muted)] text-[var(--muted-foreground)] rounded-full flex items-center justify-center mb-3 group-hover:text-[var(--primary)] group-hover:bg-[var(--primary)]/10 transition-colors">
                         <UploadCloud className="w-5 h-5" />
                       </div>
                       <p className="text-xs font-bold text-[var(--foreground)] mb-1">Click to upload image</p>
                       <p className="text-[10px] text-[var(--muted-foreground)] font-medium">JPEG, PNG, WEBP (Max 5MB)</p>
-                    </div>
+                    </label>
                   )}
                 </div>
 

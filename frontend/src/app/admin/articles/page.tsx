@@ -18,6 +18,7 @@ export default function AdminArticlesPage() {
   const [statusFilter, setStatusFilter] = useState('All');
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [selectedArticles, setSelectedArticles] = useState<string[]>([]);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   
   // Pagination & Sorting
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,6 +29,15 @@ export default function AdminArticlesPage() {
 
   useEffect(() => {
     fetchArticles();
+    
+    // Close dropdown when clicking outside
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!(e.target as Element).closest('.action-menu-container')) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const fetchArticles = async () => {
@@ -318,14 +328,21 @@ export default function AdminArticlesPage() {
                     <td className="px-6 py-4 text-sm text-[var(--muted-foreground)] text-right whitespace-nowrap">
                       {new Date(article.publishedAt || article.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
                     </td>
-                    <td className="px-6 py-4 text-center relative group/menu">
-                      <button className="p-2 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)] rounded-lg transition-colors">
+                    <td className="px-6 py-4 text-center relative action-menu-container">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenMenuId(openMenuId === article._id ? null : article._id);
+                        }}
+                        className="p-2 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)] rounded-lg transition-colors"
+                      >
                         <MoreHorizontal className="w-5 h-5" />
                       </button>
                       
-                      {/* Action Menu Dropdown (Hover) */}
-                      <div className="absolute right-10 top-1/2 -translate-y-1/2 w-48 bg-white border border-[var(--border)] rounded-xl shadow-xl opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all z-10 py-1">
-                        <Link href={`/admin/editor/${article._id}`} className="flex items-center gap-2 px-4 py-2 text-sm font-medium hover:bg-[#FAFAFA] text-[var(--foreground)]">
+                      {/* Action Menu Dropdown (Click) */}
+                      {openMenuId === article._id && (
+                        <div className="absolute right-10 top-1/2 -translate-y-1/2 w-48 bg-white border border-[var(--border)] rounded-xl shadow-xl transition-all z-10 py-1">
+                          <Link href={`/admin/editor/${article._id}`} className="flex items-center gap-2 px-4 py-2 text-sm font-medium hover:bg-[#FAFAFA] text-[var(--foreground)]">
                           <Edit3 className="w-4 h-4 text-[var(--muted-foreground)]" /> Edit Article
                         </Link>
                         <Link href={`/articles/${article.slug}`} target="_blank" className="flex items-center gap-2 px-4 py-2 text-sm font-medium hover:bg-[#FAFAFA] text-[var(--foreground)]">
@@ -342,6 +359,7 @@ export default function AdminArticlesPage() {
                           <Trash2 className="w-4 h-4" /> Delete
                         </button>
                       </div>
+                      )}
                     </td>
                   </tr>
                 ))}
