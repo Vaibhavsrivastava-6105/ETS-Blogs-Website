@@ -14,7 +14,6 @@ export default function Navbar() {
     { name: "Home", href: "/" },
     { name: "Articles", href: "/articles" },
     { name: "Categories", href: "/categories" },
-    { name: "Authors", href: "/authors" },
   ];
 
   return (
@@ -112,16 +111,7 @@ export default function Navbar() {
                     </Link>
                   </li>
                 ))}
-                <li className="border-b border-[var(--border)]/70">
-                  <Link 
-                    href="/sponsored" 
-                    onClick={() => setIsSideMenuOpen(false)}
-                    className="flex items-center justify-between px-6 py-5 text-[var(--primary)] hover:bg-[var(--primary)]/5 text-base font-bold transition-colors"
-                  >
-                    Sponsored
-                    <span className="text-xs uppercase tracking-widest opacity-70">Ad</span>
-                  </Link>
-                </li>
+
                 {isAdmin ? (
                   <li className="border-b border-[var(--border)]/70 bg-[var(--primary)]/5">
                     <Link 
