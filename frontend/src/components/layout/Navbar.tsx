@@ -1,14 +1,24 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Search, Menu, User, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const pathname = usePathname() || '';
-  const isAdmin = pathname.startsWith('/admin');
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    setIsLoggedIn(
+      localStorage.getItem("userRole") === "admin" || 
+      localStorage.getItem("isAdmin") === "true"
+    );
+  }, []);
+
+  // For visual styling specific to admin pages
+  const isAdminRoute = pathname.startsWith('/admin');
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -44,7 +54,7 @@ export default function Navbar() {
                 </span>
                 Sponsored
               </Link>
-              {isAdmin && (
+              {isLoggedIn && !isAdminRoute && (
                 <Link href="/admin" className="bg-[var(--primary)] text-white px-6 py-3 text-xs uppercase tracking-widest font-bold transition-all hover:bg-blue-800">
                   Dashboard
                 </Link>
@@ -112,7 +122,7 @@ export default function Navbar() {
                   </li>
                 ))}
 
-                {isAdmin ? (
+                {isLoggedIn ? (
                   <li className="border-b border-[var(--border)]/70 bg-[var(--primary)]/5">
                     <Link 
                       href="/admin" 

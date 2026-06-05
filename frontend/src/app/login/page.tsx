@@ -1,7 +1,7 @@
 "use client";
 
 import { Lock } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -9,6 +9,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+
+  // Auto-redirect if already logged in
+  useEffect(() => {
+    if (localStorage.getItem("userRole") === "admin" || localStorage.getItem("isAdmin") === "true") {
+      router.push("/admin");
+    }
+  }, [router]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
