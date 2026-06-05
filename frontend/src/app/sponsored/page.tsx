@@ -19,6 +19,7 @@ export default function SponsoredPage() {
         </div>
 
         {/* Hero Section */}
+        <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
           <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-8 flex flex-col items-center justify-center leading-[1.1]">
             <span className="text-[var(--foreground)] font-serif">Sponsored by</span>
             <span className="text-[#0D52BD] italic font-serif my-1">ExcelTech</span>
