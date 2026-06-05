@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Moon, Trash2, ArrowRight } from 'lucide-react';
+import { Heart, Moon, Trash2, ArrowRight, Settings } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';

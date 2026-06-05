@@ -8,6 +8,7 @@ export interface IArticle extends Document {
   status: string;
   views: number;
   publishedAt: Date;
+  coverImage?: string;
 }
 
 const ArticleSchema: Schema = new Schema({
@@ -18,6 +19,7 @@ const ArticleSchema: Schema = new Schema({
   status: { type: String, default: 'Published' },
   views: { type: Number, default: 0 },
   publishedAt: { type: Date, default: Date.now },
+  coverImage: { type: String },
 }, { timestamps: true });
 
 const Article: Model<IArticle> = mongoose.models.Article || mongoose.model<IArticle>('Article', ArticleSchema);

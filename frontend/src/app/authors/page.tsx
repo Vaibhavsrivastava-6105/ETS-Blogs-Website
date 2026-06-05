@@ -109,8 +109,8 @@ export default function AuthorsPage() {
                 <div>
                   <h4 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-wider mb-3">Focus Areas</h4>
                   <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                    {author.expertise.map(skill => (
-                      <span key={skill} className="px-3 py-1 bg-[#FAFAFA] border border-[var(--border)] rounded-md text-xs font-medium text-[var(--muted-foreground)]">
+                    {author.expertise.map((skill: string) => (
+                      <span key={skill} className="px-3 py-1 bg-[#FAFAFA] border border-[var(--border)] rounded-full text-xs font-semibold text-[var(--secondary)]">
                         {skill}
                       </span>
                     ))}

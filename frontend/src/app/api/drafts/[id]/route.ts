@@ -2,10 +2,11 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Draft from '@/models/Draft';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB();
-    const draft = await Draft.findById(params.id);
+    const { id } = await params;
+    const draft = await Draft.findById(id);
     if (!draft) {
       return NextResponse.json({ success: false, error: 'Draft not found' }, { status: 404 });
     }
@@ -15,10 +16,11 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB();
-    const deletedDraft = await Draft.findByIdAndDelete(params.id);
+    const { id } = await params;
+    const deletedDraft = await Draft.findByIdAndDelete(id);
     if (!deletedDraft) {
       return NextResponse.json({ success: false, error: 'Draft not found' }, { status: 404 });
     }

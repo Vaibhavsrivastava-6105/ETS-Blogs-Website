@@ -293,7 +293,7 @@ export default function Home() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {searchResults.map((article) => (
-                  <Link href={`/articles`} key={article._id} className="group flex flex-col bg-white border border-[var(--border)] rounded-xl overflow-hidden hover:shadow-lg transition-all">
+                  <Link href={`/articles/${article._id}`} key={article._id} className="group flex flex-col bg-white border border-[var(--border)] rounded-xl overflow-hidden hover:shadow-lg transition-all">
                     <div className="p-6 flex-grow flex flex-col">
                       <div className="flex items-center gap-2 mb-4">
                         <span className="text-xs font-bold tracking-widest uppercase text-[var(--secondary)]">{article.category}</span>
