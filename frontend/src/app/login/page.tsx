@@ -18,16 +18,30 @@ export default function LoginPage() {
     }
   }, [router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     
-    if (username === "deepak" && password === "deepak@123") {
-      localStorage.setItem("userRole", "admin");
-      localStorage.setItem("username", "Deepak");
-      router.push("/admin");
-    } else {
-      setError("Invalid admin credentials");
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        localStorage.setItem("userRole", "admin");
+        localStorage.setItem("username", "Deepak");
+        router.push("/admin");
+      } else {
+        setError(data.message || "Invalid admin credentials");
+      }
+    } catch (err) {
+      setError("An error occurred during login. Please try again.");
     }
   };
 
