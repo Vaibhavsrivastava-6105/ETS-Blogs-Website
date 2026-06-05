@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { 
   Image as ImageIcon, UploadCloud, Search, Filter, 
   Trash2, Download, Copy, Eye, Video, FileText, X,
@@ -22,6 +22,61 @@ export default function AdminMediaPage() {
   
   // Upload State
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Hidden input ref for manual selection
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const uploadToCloudinary = async (file: File) => {
+    return new Promise<{url: string, size: number}>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: reader.result })
+          });
+          const data = await res.json();
+          if (data.success) resolve({ url: data.url, size: file.size });
+          else reject(data.error);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFiles = async (files: FileList | File[]) => {
+    setIsUploading(true);
+    const newMedia: any[] = [];
+    for (const file of Array.from(files)) {
+      try {
+        const { url, size } = await uploadToCloudinary(file);
+        const formatSize = (bytes: number) => {
+          if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+          return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        };
+        const type = file.type.startsWith('video/') ? 'video' : file.type.startsWith('application/') ? 'document' : 'image';
+        
+        newMedia.push({
+          id: Math.random().toString(36).substr(2, 9),
+          name: file.name,
+          type,
+          url,
+          size: formatSize(size),
+          date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+        });
+      } catch (e) {
+        alert('Failed to upload ' + file.name);
+      }
+    }
+    if (newMedia.length > 0) {
+      setMedia((prev) => [...newMedia, ...prev]);
+    }
+    setIsUploading(false);
+  };
   
   // Preview Modal
   const [previewMedia, setPreviewMedia] = useState<any>(null);
@@ -44,13 +99,13 @@ export default function AdminMediaPage() {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    // In a real app, handle file upload here
-    alert(`Dropped ${e.dataTransfer.files.length} files for upload.`);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFiles(e.dataTransfer.files);
+    }
   };
 
   const handleUploadClick = () => {
-    // In a real app, trigger a file input click
-    alert("Trigger file browser for upload.");
+    fileInputRef.current?.click();
   };
 
   const handleDelete = (id: string, e: React.MouseEvent) => {
@@ -83,9 +138,18 @@ export default function AdminMediaPage() {
             <h1 className="text-2xl font-bold font-heading text-[var(--foreground)]">Media Library</h1>
             <p className="text-sm text-[var(--muted-foreground)] mt-1">Manage images, videos, and documents used in your content.</p>
           </div>
-          <button onClick={handleUploadClick} className="flex items-center gap-2 bg-[var(--foreground)] text-[var(--background)] px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm hover:opacity-90 transition-all">
-            <UploadCloud className="w-4 h-4" /> Upload Files
+          <button onClick={handleUploadClick} disabled={isUploading} className="flex items-center gap-2 bg-[var(--foreground)] text-[var(--background)] px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm hover:opacity-90 transition-all disabled:opacity-50">
+            <UploadCloud className="w-4 h-4" /> {isUploading ? 'Uploading...' : 'Upload Files'}
           </button>
+          {/* Hidden file input */}
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={(e) => { if (e.target.files) handleFiles(e.target.files); }} 
+            className="hidden" 
+            multiple 
+            accept="image/*,video/*,application/pdf" 
+          />
         </div>
 
         {/* Toolbar */}
@@ -134,7 +198,9 @@ export default function AdminMediaPage() {
           }`}>
             <UploadCloud className="w-8 h-8" />
           </div>
-          <h3 className="text-lg font-bold text-[var(--foreground)] mb-1">Drag and drop files here</h3>
+          <h3 className="text-lg font-bold text-[var(--foreground)] mb-1">
+            {isUploading ? 'Uploading files...' : 'Drag and drop files here'}
+          </h3>
           <p className="text-sm text-[var(--muted-foreground)] max-w-sm">Support for Images (JPEG, PNG, WEBP), Videos (MP4), and Documents (PDF) up to 20MB.</p>
         </div>
 

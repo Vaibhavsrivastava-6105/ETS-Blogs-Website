@@ -194,6 +194,10 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
       
       if (data.success && data.data._id) {
         setDraftId(data.data._id);
+        if (initialId === 'new') {
+          // Update URL without triggering a full page reload so it's not "new" anymore
+          router.replace(`/admin/editor/${data.data._id}`);
+        }
         // Clear local backup on successful server save
         localStorage.removeItem(`draft-backup-${initialId}`);
       }

@@ -17,12 +17,16 @@ export async function POST(req: Request) {
     await connectDB();
     const body = await req.json();
     
-    // Check if updating an existing draft or creating a new one
-    if (body.id) {
+    // Check if updating an existing draft or creating a new one from an article
+    if (body.id && body.id !== 'new') {
       const updatedDraft = await Draft.findByIdAndUpdate(
         body.id, 
-        { title: body.title, content: body.content, lastSaved: new Date() },
-        { new: true, runValidators: true }
+        { 
+          title: body.title || 'Untitled Draft', 
+          content: body.content, 
+          lastSaved: new Date() 
+        },
+        { new: true, runValidators: true, upsert: true, setDefaultsOnInsert: true }
       );
       if (updatedDraft) {
         return NextResponse.json({ success: true, data: updatedDraft });
