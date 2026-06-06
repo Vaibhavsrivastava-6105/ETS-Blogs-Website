@@ -63,7 +63,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
   const [coverImage, setCoverImage] = useState("");
   
   // Publishing State
-  const [status, setStatus] = useState("Draft");
+  const [status, setStatus] = useState("Published");
   const [visibility, setVisibility] = useState("Public");
   const [scheduleDate, setScheduleDate] = useState("");
   const [scheduleTime, setScheduleTime] = useState("");
@@ -182,6 +182,14 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             setMetaDescription(data.data.seo?.metaDescription || '');
             setKeywords(data.data.seo?.keywords || '');
             
+            if (data.data.status) setStatus(data.data.status);
+            if (data.data.visibility) setVisibility(data.data.visibility);
+            if (data.data.scheduledFor) {
+              const d = new Date(data.data.scheduledFor);
+              setScheduleDate(d.toISOString().split('T')[0]);
+              setScheduleTime(d.toTimeString().substring(0, 5));
+            }
+            
             if (data.data.content) {
               editor.commands.setContent(data.data.content, { emitUpdate: false });
             }
@@ -193,7 +201,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                 tags: Array.isArray(data.data.tags) ? data.data.tags.join(', ') : (data.data.tags || ''), 
                 coverImage: data.data.coverImage || '', 
                 content: data.data.content || '', 
-                status: data.data.status || 'Draft', 
+                status: data.data.status || 'Published', 
                 visibility: data.data.visibility || 'Public', 
                 metaTitle: data.data.seo?.metaTitle || '', 
                 metaDescription: data.data.seo?.metaDescription || '', 
