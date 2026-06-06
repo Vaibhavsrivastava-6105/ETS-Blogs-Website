@@ -17,36 +17,36 @@ import {
   Redo 
 } from 'lucide-react';
 
+const ToolbarButton = ({ 
+  onClick, 
+  isActive = false, 
+  disabled = false, 
+  children 
+}: { 
+  onClick: () => void, 
+  isActive?: boolean, 
+  disabled?: boolean, 
+  children: React.ReactNode 
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    onMouseDown={(e) => e.preventDefault()}
+    disabled={disabled}
+    className={`p-2 rounded-lg transition-colors flex items-center justify-center ${
+      isActive 
+        ? 'bg-[var(--foreground)] text-[var(--background)]' 
+        : 'text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)]'
+    } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+  >
+    {children}
+  </button>
+);
+
 export function EditorToolbar({ editor }: { editor: Editor | null }) {
   if (!editor) {
     return null;
   }
-
-  const ToolbarButton = ({ 
-    onClick, 
-    isActive = false, 
-    disabled = false, 
-    children 
-  }: { 
-    onClick: () => void, 
-    isActive?: boolean, 
-    disabled?: boolean, 
-    children: React.ReactNode 
-  }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      onMouseDown={(e) => e.preventDefault()}
-      disabled={disabled}
-      className={`p-2 rounded-lg transition-colors flex items-center justify-center ${
-        isActive 
-          ? 'bg-[var(--foreground)] text-[var(--background)]' 
-          : 'text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)]'
-      } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-    >
-      {children}
-    </button>
-  );
 
   return (
     <div className="sticky top-16 z-20 w-full flex flex-wrap items-center justify-center gap-1 p-2 bg-white border-b border-[var(--border)] shadow-sm">

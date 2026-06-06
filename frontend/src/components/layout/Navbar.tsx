@@ -11,11 +11,14 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    setIsLoggedIn(
-      localStorage.getItem("userRole") === "admin" || 
-      localStorage.getItem("isAdmin") === "true"
-    );
-  }, []);
+    const checkLogin = () => {
+      const isUserAdmin = localStorage.getItem("userRole") === "admin" || localStorage.getItem("isAdmin") === "true";
+      if (isUserAdmin !== isLoggedIn) {
+        setIsLoggedIn(isUserAdmin);
+      }
+    };
+    checkLogin();
+  }, [isLoggedIn]);
 
   // For visual styling specific to admin pages
   const isAdminRoute = pathname.startsWith('/admin');
