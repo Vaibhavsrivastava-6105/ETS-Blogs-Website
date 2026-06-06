@@ -89,7 +89,7 @@ export default function AdminCategoriesPage() {
   const handleDelete = async () => {
     if (!showDeleteModal) return;
     try {
-      const res = await fetch(`/api/categories/${showDeleteModal}`, {
+      const res = await fetch(`/api/categories/${showDeleteModal}?reassignTo=${reassignTo}`, {
         method: 'DELETE',
       });
       if (res.ok) {
