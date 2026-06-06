@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Article from '@/models/Article';
@@ -29,6 +31,10 @@ export async function POST(req: Request) {
       category: body.category,
       tags: parsedTags,
       coverImage: body.coverImage,
+      status: body.status,
+      visibility: body.visibility,
+      scheduledFor: body.scheduledFor,
+      seo: body.seo
     });
 
     return NextResponse.json({ success: true, data: newArticle }, { status: 201 });

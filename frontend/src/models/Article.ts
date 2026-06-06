@@ -6,6 +6,13 @@ export interface IArticle extends Document {
   category: string;
   tags: string[];
   status: string;
+  visibility: string;
+  scheduledFor?: Date;
+  seo?: {
+    metaTitle: string;
+    metaDescription: string;
+    keywords: string;
+  };
   views: number;
   publishedAt: Date;
   coverImage?: string;
@@ -17,6 +24,13 @@ const ArticleSchema: Schema = new Schema({
   category: { type: String, required: true },
   tags: { type: [String], default: [] },
   status: { type: String, default: 'Published' },
+  visibility: { type: String, default: 'Public' },
+  scheduledFor: { type: Date },
+  seo: {
+    metaTitle: { type: String },
+    metaDescription: { type: String },
+    keywords: { type: String }
+  },
   views: { type: Number, default: 0 },
   publishedAt: { type: Date, default: Date.now },
   coverImage: { type: String },

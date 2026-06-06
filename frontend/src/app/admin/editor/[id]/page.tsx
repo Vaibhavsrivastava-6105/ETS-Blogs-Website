@@ -55,8 +55,10 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
   const [activeTab, setActiveTab] = useState<'content' | 'settings' | 'seo'>('content');
   
   // Document Metadata
+  // Document Metadata
   const [draftId, setDraftId] = useState<string | null>(null);
-  const [category, setCategory] = useState("Software Design");
+  const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState<{_id: string, name: string}[]>([]);
   const [tags, setTags] = useState("");
   const [coverImage, setCoverImage] = useState("");
   
@@ -78,12 +80,32 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
   const titleRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-resize title textarea when content changes (e.g. on load)
+  // Auto-resize title textarea when content changes (e.g. on load)
   useEffect(() => {
     if (titleRef.current) {
       titleRef.current.style.height = 'auto';
       titleRef.current.style.height = `${titleRef.current.scrollHeight}px`;
     }
   }, [title]);
+
+  // Fetch Categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch('/api/categories');
+        const data = await res.json();
+        if (data.success) {
+          setCategories(data.data);
+          if (!category && data.data.length > 0) {
+            setCategory(data.data[0].name);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load categories", err);
+      }
+    };
+    fetchCategories();
+  }, []);
   
   // TipTap Editor Setup
   const editor = useEditor({
@@ -149,7 +171,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
               setPublishedArticleId(data.data._id);
             }
             setTitle(data.data.title || '');
-            setCategory(data.data.category || 'Software Design');
+            setCategory(data.data.category || '');
             
             // Format tags if they come as an array from Article
             const tagsData = data.data.tags;
@@ -167,7 +189,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
             if (isLoadedFromArticle || data.data.status === 'Published') {
               contentHashRef.current = JSON.stringify({ 
                 title: data.data.title || '', 
-                category: data.data.category || 'Software Design', 
+                category: data.data.category || '', 
                 tags: Array.isArray(data.data.tags) ? data.data.tags.join(', ') : (data.data.tags || ''), 
                 coverImage: data.data.coverImage || '', 
                 content: data.data.content || '', 
@@ -567,10 +589,14 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full px-3 py-2.5 rounded-lg border border-[var(--border)] bg-[#FAFAFA] text-sm font-medium focus:ring-2 focus:ring-[var(--primary)] focus:bg-white outline-none"
                   >
-                    <option>Software Design</option>
-                    <option>Web Development</option>
-                    <option>Tutorials</option>
-                    <option>Tech News</option>
+                    <option value="" disabled>Select Category</option>
+                    {categories.length === 0 ? (
+                      <option value="Uncategorized">Uncategorized</option>
+                    ) : (
+                      categories.map(cat => (
+                        <option key={cat._id} value={cat.name}>{cat.name}</option>
+                      ))
+                    )}
                   </select>
                 </div>
 
