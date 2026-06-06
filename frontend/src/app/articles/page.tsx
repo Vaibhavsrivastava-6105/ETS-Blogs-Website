@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Search, Loader2, ArrowRight, User } from 'lucide-react';
+import { Search, Loader2, ArrowRight, User, X, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 
@@ -28,7 +28,8 @@ export default function ArticlesPage() {
 function ArticlesContent() {
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
-  const [activeCategory, setActiveCategory] = useState(searchParams.get("category") || "All");
+  const [activeCategories, setActiveCategories] = useState<string[]>(searchParams.get("category") && searchParams.get("category") !== "All" ? [searchParams.get("category") as string] : []);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<string[]>(["All"]);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,12 +60,18 @@ function ArticlesContent() {
         const res = await fetch('/api/search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: searchQuery, category: activeCategory })
+          body: JSON.stringify({ query: searchQuery, category: "All" })
         });
         const data = await res.json();
         
-        // Client-side sorting based on our new filter
         let fetchedArticles = Array.isArray(data.data) ? data.data : [];
+        
+        // Client-side category filtering
+        if (activeCategories.length > 0) {
+          fetchedArticles = fetchedArticles.filter((a: any) => activeCategories.includes(a.category));
+        }
+        
+        // Client-side sorting based on our new filter
         if (sortOrder === "asc") {
           fetchedArticles = fetchedArticles.sort((a: any, b: any) => new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime());
         } else {
@@ -85,7 +92,7 @@ function ArticlesContent() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchQuery, activeCategory, sortOrder]);
+  }, [searchQuery, activeCategories, sortOrder]);
 
   return (
     <div className="bg-[var(--background)] min-h-screen pb-24">
@@ -135,22 +142,67 @@ function ArticlesContent() {
             {/* Categories Menu */}
             <div>
               <label className="block text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider mb-3">Categories</label>
-              <div className="flex flex-col gap-1">
-                {categories.map(category => (
-                  <button
-                    key={category}
-                    onClick={() => setActiveCategory(category)}
-                    className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-bold transition-all flex items-center justify-between group
-                      ${activeCategory === category 
-                        ? 'bg-[var(--foreground)] text-[var(--background)] shadow-md' 
-                        : 'text-[var(--muted-foreground)] hover:bg-[#FAFAFA] hover:text-[var(--foreground)]'
-                      }`}
-                  >
-                    {category}
-                    {activeCategory === category && <ArrowRight className="w-4 h-4 opacity-70" />}
-                  </button>
-                ))}
+              
+              <div className="relative">
+                <button
+                  onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                  className="w-full px-4 py-3 bg-[#FAFAFA] border border-[var(--border)] rounded-xl flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-sm font-bold text-[var(--foreground)]"
+                >
+                  <span>Select Categories</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isCategoryOpen ? "rotate-180" : ""}`} />
+                </button>
+                
+                {isCategoryOpen && (
+                  <div className="absolute z-10 w-full mt-2 bg-white border border-[var(--border)] rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                    {categories.filter(c => c !== "All").map(category => {
+                      const isSelected = activeCategories.includes(category);
+                      return (
+                        <button
+                          key={category}
+                          onClick={() => {
+                            if (isSelected) {
+                              setActiveCategories(prev => prev.filter(c => c !== category));
+                            } else {
+                              setActiveCategories(prev => [...prev, category]);
+                            }
+                          }}
+                          className={`w-full text-left px-4 py-2.5 text-sm font-bold transition-all flex items-center justify-between
+                            ${isSelected 
+                              ? 'bg-blue-50 text-blue-700' 
+                              : 'text-[var(--muted-foreground)] hover:bg-[#FAFAFA] hover:text-[var(--foreground)]'
+                            }`}
+                        >
+                          {category}
+                          {isSelected && <div className="w-2 h-2 rounded-full bg-blue-600"></div>}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
+
+              {/* Selected Categories Badges */}
+              {activeCategories.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {activeCategories.map(category => (
+                    <span key={category} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--foreground)] text-[var(--background)] text-xs font-bold shadow-sm">
+                      {category}
+                      <button 
+                        onClick={() => setActiveCategories(prev => prev.filter(c => c !== category))}
+                        className="hover:bg-white/20 rounded-full p-0.5 transition-colors"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                  <button 
+                    onClick={() => setActiveCategories([])}
+                    className="text-xs font-bold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors ml-1"
+                  >
+                    Clear All
+                  </button>
+                </div>
+              )}
             </div>
 
           </div>
@@ -165,7 +217,7 @@ function ArticlesContent() {
               <img src="/logo.jpg" alt="ETS Logo" className="w-full h-full object-contain scale-[1.3]" />
             </div>
             <h2 className="text-3xl md:text-4xl font-black font-heading text-[var(--foreground)] tracking-tight">
-              {activeCategory === "All" ? "All Categories" : activeCategory}
+              {activeCategories.length === 0 ? "All Categories" : activeCategories.join(" & ")}
             </h2>
           </div>
 
