@@ -7,6 +7,9 @@
 }
 
 @layer base {
+  html {
+    font-size: 14px; /* Scales down the entire UI by ~15% to match 80% zoom feel */
+  }
   :root {
     --background: #FCFCFA;
     --foreground: #111827;
