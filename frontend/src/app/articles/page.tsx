@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Search, Loader2, ArrowRight, User, X, ChevronDown } from 'lucide-react';
+import { Search, Loader2, ArrowRight, User, X, ChevronDown, ListFilter, LayoutGrid, CheckSquare, Square } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 
@@ -98,111 +98,92 @@ function ArticlesContent() {
     <div className="bg-[var(--background)] min-h-screen pb-24">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-16 flex flex-col lg:flex-row gap-12 lg:gap-20">
         
-        {/* LEFT SIDEBAR: Hero, Search, Filters & Categories */}
-        <aside className="lg:w-80 flex-shrink-0 flex flex-col gap-10">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-black font-heading text-[var(--foreground)] tracking-tight mb-4 leading-tight">
-              Explore<br />Articles
+        {/* LEFT SIDEBAR: App Navigation Style */}
+        <aside className="lg:w-64 flex-shrink-0 flex flex-col gap-6 sticky top-24 self-start">
+          <div className="mb-4">
+            <h1 className="text-3xl font-black font-heading text-[var(--foreground)] tracking-tight mb-2 leading-tight">
+              Explore Articles
             </h1>
-            <p className="text-lg text-[var(--muted-foreground)] leading-relaxed">
-              Dive into our library of expert insights and tutorials.
+            <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
+              Dive into our expert insights.
             </p>
           </div>
 
-          <div className="flex flex-col gap-8 bg-white border border-[var(--border)] p-6 rounded-2xl shadow-sm sticky top-28">
+          <div className="flex flex-col gap-2 w-full">
             
-            {/* Search */}
-            <div>
-              <label className="block text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider mb-3">Search</label>
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-foreground)]" />
+            {/* Search Item */}
+            <div className="group relative">
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors hover:bg-gray-100/50">
+                <Search className="w-5 h-5 text-gray-400" />
                 <input 
                   type="text" 
-                  placeholder="Keywords..." 
+                  placeholder="Search articles..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-3 bg-[#FAFAFA] border border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-shadow text-sm"
+                  className="bg-transparent border-none outline-none text-sm w-full font-medium text-[var(--foreground)] placeholder:text-gray-400"
                 />
               </div>
             </div>
 
-            {/* Sort */}
-            <div>
-              <label className="block text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider mb-3">Sort By</label>
-              <select 
-                value={sortOrder} 
-                onChange={(e) => setSortOrder(e.target.value as "desc" | "asc")}
-                className="w-full px-4 py-3 bg-[#FAFAFA] border border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-sm appearance-none cursor-pointer"
-              >
-                <option value="desc">Newest First</option>
-                <option value="asc">Oldest First</option>
-              </select>
+            {/* Sort By Item */}
+            <div className="group relative">
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors hover:bg-gray-100/50">
+                <ListFilter className="w-5 h-5 text-gray-400" />
+                <select 
+                  value={sortOrder} 
+                  onChange={(e) => setSortOrder(e.target.value as "desc" | "asc")}
+                  className="bg-transparent border-none outline-none text-sm w-full font-medium text-[var(--foreground)] appearance-none cursor-pointer"
+                >
+                  <option value="desc">Newest First</option>
+                  <option value="asc">Oldest First</option>
+                </select>
+                <ChevronDown className="w-4 h-4 text-gray-400 pointer-events-none absolute right-4" />
+              </div>
             </div>
 
-            {/* Categories Menu */}
+            {/* Categories Accordion */}
             <div>
-              <label className="block text-xs font-bold text-[var(--muted-foreground)] uppercase tracking-wider mb-3">Categories</label>
-              
-              <div className="relative">
-                <button
-                  onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                  className="w-full px-4 py-3 bg-[#FAFAFA] border border-[var(--border)] rounded-xl flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-sm font-bold text-[var(--foreground)]"
-                >
-                  <span>Select Categories</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${isCategoryOpen ? "rotate-180" : ""}`} />
-                </button>
-                
-                {isCategoryOpen && (
-                  <div className="absolute z-10 w-full mt-2 bg-white border border-[var(--border)] rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                    {categories.filter(c => c !== "All").map(category => {
-                      const isSelected = activeCategories.includes(category);
-                      return (
-                        <button
-                          key={category}
-                          onClick={() => {
-                            if (isSelected) {
-                              setActiveCategories(prev => prev.filter(c => c !== category));
-                            } else {
-                              setActiveCategories(prev => [...prev, category]);
-                            }
-                          }}
-                          className={`w-full text-left px-4 py-2.5 text-sm font-bold transition-all flex items-center justify-between
-                            ${isSelected 
-                              ? 'bg-blue-50 text-blue-700' 
-                              : 'text-[var(--muted-foreground)] hover:bg-[#FAFAFA] hover:text-[var(--foreground)]'
-                            }`}
-                        >
-                          {category}
-                          {isSelected && <div className="w-2 h-2 rounded-full bg-blue-600"></div>}
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Selected Categories Badges */}
-              {activeCategories.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {activeCategories.map(category => (
-                    <span key={category} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--foreground)] text-[var(--background)] text-xs font-bold shadow-sm">
-                      {category}
-                      <button 
-                        onClick={() => setActiveCategories(prev => prev.filter(c => c !== category))}
-                        className="hover:bg-white/20 rounded-full p-0.5 transition-colors"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                  <button 
-                    onClick={() => setActiveCategories([])}
-                    className="text-xs font-bold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors ml-1"
-                  >
-                    Clear All
-                  </button>
+              <button
+                onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-colors hover:bg-gray-100/50 group ${isCategoryOpen ? 'bg-indigo-50/50' : ''}`}
+              >
+                <div className="flex items-center gap-3">
+                  <LayoutGrid className={`w-5 h-5 transition-colors ${isCategoryOpen ? 'text-[var(--primary)]' : 'text-gray-400'}`} />
+                  <span className={`text-sm font-medium transition-colors ${isCategoryOpen ? 'text-[var(--primary)] font-bold' : 'text-[var(--foreground)]'}`}>
+                    Categories
+                  </span>
                 </div>
-              )}
+                <ChevronDown className={`w-4 h-4 transition-all duration-300 ${isCategoryOpen ? "rotate-180 text-[var(--primary)]" : "text-gray-400"}`} />
+              </button>
+              
+              {/* Category Checkboxes */}
+              <div className={`overflow-hidden transition-all duration-300 ${isCategoryOpen ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'}`}>
+                <div className="flex flex-col gap-1 pl-12 pr-4">
+                  {categories.filter(c => c !== "All").map(category => {
+                    const isSelected = activeCategories.includes(category);
+                    return (
+                      <button
+                        key={category}
+                        onClick={() => {
+                          if (isSelected) {
+                            setActiveCategories(prev => prev.filter(c => c !== category));
+                          } else {
+                            setActiveCategories(prev => [...prev, category]);
+                          }
+                        }}
+                        className={`w-full text-left py-2 text-sm transition-all flex items-center justify-between
+                          ${isSelected 
+                            ? 'font-bold text-[var(--primary)]' 
+                            : 'font-medium text-gray-500 hover:text-[var(--foreground)]'
+                          }`}
+                      >
+                        {category}
+                        {isSelected ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4 opacity-30" />}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
             </div>
 
           </div>
