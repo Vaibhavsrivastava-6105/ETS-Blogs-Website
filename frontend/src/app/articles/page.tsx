@@ -193,13 +193,34 @@ function ArticlesContent() {
         <main className="flex-1 flex flex-col min-h-screen">
           
           {/* Top Dynamic Header */}
-          <div className="flex items-center gap-4 mb-10 pb-6 border-b border-[var(--border)]">
-            <div className="w-14 h-14 flex items-center justify-center shrink-0">
-              <img src="/logo.jpg" alt="ETS Logo" className="w-full h-full object-contain scale-[1.3]" />
-            </div>
-            <h2 className="text-3xl md:text-4xl font-black font-heading text-[var(--foreground)] tracking-tight">
-              {activeCategories.length === 0 ? "All Categories" : activeCategories.join(" & ")}
-            </h2>
+          <div className="flex items-center flex-wrap gap-3 mb-10 pb-6 border-b border-[var(--border)]">
+            {activeCategories.length === 0 ? (
+              <h2 className="text-3xl md:text-4xl font-black font-heading text-[var(--foreground)] tracking-tight">
+                All Categories
+              </h2>
+            ) : (
+              activeCategories.map(category => (
+                <span key={category} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[var(--foreground)] text-[var(--background)] text-sm font-bold shadow-sm">
+                  {category}
+                  <button 
+                    onClick={() => setActiveCategories(prev => prev.filter(c => c !== category))}
+                    className="hover:bg-white/20 rounded-full p-1 transition-colors flex items-center justify-center"
+                    aria-label={`Remove ${category} filter`}
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </span>
+              ))
+            )}
+            
+            {activeCategories.length > 0 && (
+              <button 
+                onClick={() => setActiveCategories([])}
+                className="text-sm font-bold text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors ml-2 underline decoration-transparent hover:decoration-current underline-offset-4"
+              >
+                Clear All
+              </button>
+            )}
           </div>
 
           {/* Articles Grid */}
